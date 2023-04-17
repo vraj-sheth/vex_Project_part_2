@@ -478,7 +478,7 @@ void linefollowing(){
     }
     // testing if the git repositry is working
 }
-
+// thesting if things are in order after cloning 
 
 
 

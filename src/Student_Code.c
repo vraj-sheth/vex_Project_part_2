@@ -480,6 +480,12 @@ void linefollowing(){
 
 }
 
+// things to do:
+// rewrite a encoder to milimeter fucntion
+// test line following
+// test arm angle function
+// test turning angle fucntion
+
 
 
 

@@ -24,7 +24,8 @@ int robotWidth = 250;					// width of the robot including the wheel thickness [m
 int wheelWidth = 22;					// width of the driving wheel [mm]
 double drivingWheelRatio = 0.0;	    // ratio of wheel shaft rotations to wheel motor shaft rotations
 double armRatio = 0.0;				// ratio of arm shaft rotations to arm motor shaft rotations
-double encCountPerRev = 900.0;	    // number of encoder ticks per 1 revolution of the motor shaft
+double encCountPerRev = 900.0;
+double pivotWheelRatio = 114.0;    // number of encoder ticks per 1 revolution of the motor shaft
 // ------------------------------------------------------------------------------------
 
 /* Write your code in the function below. You may add helper functions below the studentCode function. */
@@ -33,7 +34,13 @@ void student_Main(){
 //drivePcont ( 600.0,1.2,0.08);
 //driveUntilBlack(40.0);
 
-rotateAngle(2.0,90.0);
+//rotateAngle(0.8,90.0);
+
+//moveArmAngle(20.0,2.0);
+//turnRobot(90.0,2,0.8);
+//turnPcont(90.0,2000.0);
+
+linefollowing();
    
 }
 
@@ -164,9 +171,12 @@ void rotateAngle(double Kp, double targetAngle){
     double average_distance_traveled;
     double pivotDiameter=robotWidth-22.0;
     double pivotCircle= pivotDiameter*3.14169265358979323846;
-    double distance_to_travel=abs(targetAngle)/360.0*pivotCircle;
+    double distance_to_travel=(targetAngle)/360.0*pivotCircle;
     double v1,v2;
     double diff;
+    resetEncoder(LeftEncoder);
+    resetEncoder(RightEncoder);
+
     do{
         leftencCount=readSensor(LeftEncoder);
         rightencCount=readSensor(RightEncoder);
@@ -180,15 +190,19 @@ void rotateAngle(double Kp, double targetAngle){
 
         pwr=Kp*error;
 
-        v1=convertPower(pwr)*10;
-        v2=convertPower(diff)*10;
-       
-        motorPower(LeftMotor,v1);
-        motorPower(RightMotor,(v1+v2)*-1);
-        delay(50);
+ 
 
+        v1=convertPower(pwr)*5;
+        v2=convertPower(diff)*5;
+       
+        motorPower(LeftMotor,v1*-1);
+        motorPower(RightMotor,(v1+v2));
+        delay(50);
+        // if (fabs(average_distance_traveled)==distance_to_travel){
+        //     break;
+        // }
         
-    }while(error!=0.0);
+    }while(1);
 
     motorPower(LeftMotor,0);
     motorPower(RightMotor,0);
@@ -247,9 +261,9 @@ void driveUntilBlack(double precent_power){
     armUp(5000);
     resetEncoder(ArmEncoder);
     
-    while(currentAngle!=Angle){
+    while(error<0.2){
         int currnetArmEnc=readSensor(ArmEncoder);
-        currentAngle=((currnetArmEnc*360)/(7*900))+56; // 56 is the angle of the arm at top position
+        currentAngle=((currnetArmEnc*360)/(7*900))+41; // 56 is the angle of the arm at top position
         error=Angle-currentAngle;
         u=kp*error;
 
@@ -264,53 +278,19 @@ void driveUntilBlack(double precent_power){
 
 
 
-    // armDown(5000);
-    // resetEncoder(ArmEncoder);
-    // delay(50);
-    // lowerEncLim=readSensor(ArmEncoder);
 
-    // armUp(5000);
-    // delay(50);
-    // upperEncLim= readSensor(ArmEncoder);
-
-
-
-    // int horizontalCount = (upperEncLim+lowerEncLim)/2;
-    // double horizontalAngle=(horizontalCount*360)/(900*7);
-
-    // //double AngleToTop= ((upperEncLim-horizontalCount)*360)/(900*7);
-    
-    // double targetAngle=horizontalAngle+Angle;
-
-    // while(targetAngle != currentAngle){
-
-    //     u=kp*error;
-
-    //     motorPower(ArmMotor,u);
-    //     delay(50);
-    //     double currentArmEnc=readSensor(ArmEncoder);
-    //     double currentAngle=((currentArmEnc*360)/900*7);
-
-    //     error=targetAngle-currentAngle;
-    // }
-
-    // motorPower(ArmMotor,0);
-    
- 
-
-
-void turnRobot(double angle, double voltage, double Kp, double Ki) {
+void turnRobot(double angle,  double Kp, double Ki) {
 
   double angleInRadians = fabs(angle) * 3.14159265359 / 180.0;
 
   double Arcdistance = angleInRadians * 125.0;
 
-  double error = 0;
+  double error = angle;
   double i = 0;             //consider making the power = to the kp* the error, and define the error earlier on.
 
 
-  motorPower(LeftMotor, voltage);
-  motorPower(RightMotor, -voltage);
+  motorPower(LeftMotor, (Kp*error));
+  motorPower(RightMotor, -(Kp*error));
 
   while (fabs(error) < 0.1) { // the 0.1 is the tolerance
     int leftEncoderValue = readSensor(LeftEncoder);
@@ -325,13 +305,68 @@ void turnRobot(double angle, double voltage, double Kp, double Ki) {
 
     double u = Kp*error+Ki*i;
 
-    motorPower(LeftMotor,voltage+u);
-    motorPower(RightMotor,-voltage+u);
+    motorPower(LeftMotor,u);
+    motorPower(RightMotor,-u);
   }
 
   motorPower(LeftMotor, 0);
   motorPower(RightMotor, 0);
 
+}
+
+
+void turnPcont(double targetAngle, double Kp){
+  // Intialise variables
+  double error, U = 0;
+  double arc_length;
+  int LeftWheelPower, RightWheelPower, L_Encoder_Count, R_Encoder_Count;
+  double required_encoder_count;
+
+  // Zero encoders
+  resetEncoder(LeftEncoder);
+  resetEncoder(RightEncoder);
+    double angleInRadians = fabs(targetAngle) * 3.14159265359 / 180.0;
+
+  //Arc length calculation
+  //Formula: Arc length = theta * (pi/180) * r - where theta is in degrees
+
+  arc_length = angleInRadians * 125.0; //pivotWheelRatio * (3.14159265359/180) * targetAngle;   //This converts the desired angle of rotation into mm
+  
+  required_encoder_count = (arc_length / 0.3593) ; // Converts the desired arc length into encoder counts
+
+  lcd_print(2,"%d", arc_length);
+
+  while(1){
+    L_Encoder_Count = readSensor(LeftEncoder);
+    R_Encoder_Count = readSensor(RightEncoder);
+
+    int Encoder_Average = (abs(R_Encoder_Count) + abs(L_Encoder_Count))/2; //The average encoder count of the two encoders
+    
+    lcd_print(3,"%d", L_Encoder_Count);
+
+    // If the encoder average is less than the required encoder count send power to the motors
+    if(Encoder_Average <= required_encoder_count){
+      
+      //P loop control
+
+    error = R_Encoder_Count - L_Encoder_Count; 
+     U = (Kp * error);
+
+      //Clockwise turn requires left wheel to move forward -> positive power | Right wheel to reverse -> negative power
+      LeftWheelPower += (U);
+      RightWheelPower -= (-U);
+      motorPower(RightMotor, convertPower(RightWheelPower));
+      motorPower(LeftMotor, convertPower(LeftWheelPower));
+
+    }
+    else{
+      motorPower(RightMotor,0);
+      motorPower(LeftMotor,0);
+    }
+
+    delay(50); //The required 50ms delay
+
+  }
 }
 
 
@@ -347,14 +382,14 @@ void driveStriaght( double voltage){
 
 
 void TurnRight (double voltage){
-    motorPower(RightMotor,-3500);
-    motorPower(LeftMotor,3500);
+    motorPower(RightMotor,-voltage);
+    motorPower(LeftMotor,voltage);
 }
 
 
 void TurnLeft(double voltage){
-    motorPower(RightMotor,3500);
-    motorPower(LeftMotor,-3500);
+    motorPower(RightMotor,voltage);
+    motorPower(LeftMotor,-voltage);
 }
 
 
@@ -365,12 +400,14 @@ void stop(){
 
 
 void linefollowing(){
-    double brownUpperIm= 2400.0;
+
+    double PWR=1200.0;
+    double brownUpperIm= 2200.0;
     double brownLowerLim= 2000.0;
 
 
     double blackUpperLim= 2700.0;
-    double blackLowerLim=2401.0;
+    double blackLowerLim=2450.0;
 
 
 
@@ -420,58 +457,64 @@ void linefollowing(){
 
         //sensor conditions
         if (leftSeesBrown==false && middleSeesBrown== true && rightSeesBrown== false){
-            driveStriaght(3500.0);
+                motorPower(RightMotor,PWR);                                                // middle sees brown
+                motorPower(LeftMotor,PWR);
         }
 
 
         if(leftSeesBrown==false && middleSeesBrown== true && rightSeesBrown==true){
-            TurnRight(3500);
+            TurnRight(PWR);
             delay(50);
-            driveStriaght(3500.0);
+                motorPower(RightMotor,PWR);                                                //90 to the right
+                motorPower(LeftMotor,PWR);
         }
 
 
         if(leftSeesBrown==true && middleSeesBrown==true && rightSeesBrown==false){
-            TurnLeft(3500.0);
-            delay(50);
-            driveStriaght(3500.0);
+            TurnLeft(PWR);
+            delay(50);                                                                      //90 to the left
+                motorPower(RightMotor,PWR);
+                motorPower(LeftMotor,PWR);
         }
 
 
-        if (leftSeesBrown==false && middleSeesBrown==false && rightSeesBrown==false){
-            TurnRight(3500.0); // hoping turning right will point the robot in the correct direction
+        if (leftSeesBrown==false && middleSeesBrown==false && rightSeesBrown==false){                   //not on the line
+            TurnRight(PWR); // hoping turning right will point the robot in the correct direction
         }
 
 
         if (leftSeesBrown==true && middleSeesBrown==true && rightSeesBrown== true){
-            driveStriaght(3500.0);
+                motorPower(RightMotor,PWR);
+                motorPower(LeftMotor,PWR);                                                     // robot perpendicular to line
             delay(50);
-            TurnRight(3500.0);
+            TurnRight(PWR);
         }
 
 
         if (leftSeesBrown==true && middleSeesBrown==false && rightSeesBrown==true){
-            TurnRight(3500.0); //robot is wedged in corner, hoping turning right will fix it
+            TurnRight(PWR); //robot is wedged in corner, hoping turning right will fix it        // stuck in corner
         }
 
 
         if (leftSeesBrown==false && middleSeesBrown==false && rightSeesBrown==true){
-            TurnRight(3500.0);
-            delay(50);
-            driveStriaght(3500.0);
+            TurnRight(PWR);
+            // delay(50);
+                // motorPower(RightMotor,PWR);                                                // compensateing for over turn to the left
+                // motorPower(LeftMotor,PWR);
         }
 
 
         if (leftSeesBrown==true && middleSeesBrown==false && rightSeesBrown==false){
-            TurnLeft(3500.0);
-            delay(50);
-            driveStriaght(3500.0);
+            TurnLeft(PWR);
+            // delay(50);                                                                      // compensating for over turn to the right
+            //     motorPower(RightMotor,PWR);
+            //     motorPower(LeftMotor,PWR);
         }
 
 
         if ( leftSeesBlack==true && middleSeesBlack== true && rightSeesBlack== true){
             stop();
-            break;
+            break;                                                                          // sees balck
         }
 
 

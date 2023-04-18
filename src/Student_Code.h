@@ -21,13 +21,15 @@ void drive_to_can(int stopping_distance);
 void rotateAngle(double Kp, double targetAngle);
 void driveUntilBlack(double precent_power);
  void moveArmAngle(double Angle, double kp);
-void turnRobot(double angle, double voltage, double Kp, double Ki) ;
+void turnRobot(double angle, double Kp, double Ki) ;
 
 void driveStriaght( double voltage);
 void TurnRight (double voltage);
 void TurnLeft(double voltage);
 void stop();
 void linefollowing();
+
+void turnPcont(double targetAngle, double Kp);
 // most of the turn angle functions dont work, the newest one is the turRobot function
 // DO NOT ADD ANY PROTOTYPES AFTER THIS LINE
 #endif  // STUDENT_CODE_H

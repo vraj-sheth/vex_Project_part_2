@@ -432,6 +432,8 @@ void stop(){
 
 void linefollowing(){
 
+    double senario=0;
+
     double PWR=2000.0;
     double brownUpperIm= 2200.0;
     double brownLowerLim= 2000.0;
@@ -490,13 +492,31 @@ void linefollowing(){
         if (leftSeesBrown==false && middleSeesBrown== true && rightSeesBrown== false){
                 motorPower(RightMotor,PWR);                                                // middle sees brown
                 motorPower(LeftMotor,PWR);
+                senario=1;
+        }
+        if (leftSeesBrown==false && middleSeesBrown==false && rightSeesBrown==true){
+            TurnRight(PWR);
+            // delay(50);
+                // motorPower(RightMotor,PWR);                                                // compensateing for over turn to the left
+                // motorPower(LeftMotor,PWR);
+                senario=2;
         }
 
+
+        if (leftSeesBrown==true && middleSeesBrown==false && rightSeesBrown==false){
+            TurnLeft(PWR);
+            // delay(50);                                                                      // compensating for over turn to the right
+            //     motorPower(RightMotor,PWR);
+            //     motorPower(LeftMotor,PWR);
+            senario=3;
+            
+        }
 
         if(leftSeesBrown==false && middleSeesBrown== true && rightSeesBrown==true){
             TurnRight(PWR);
                 motorPower(RightMotor,PWR);                                                //90 to the right
                 motorPower(LeftMotor,PWR);
+                senario=4;
         }
 
 
@@ -505,13 +525,23 @@ void linefollowing(){
             //delay(50);                                                                      //90 to the left
                 motorPower(RightMotor,PWR);
                 motorPower(LeftMotor,PWR);
+                senario=5;
         }
 
 
-        if (leftSeesBrown==false && middleSeesBrown==false && rightSeesBrown==false){                   //not on the line
-            TurnRight(PWR);
-            delay(50); // hoping turning right will point the robot in the correct direction
-        }
+        // if (leftSeesBrown==false && middleSeesBrown==false && rightSeesBrown==false){                   //not on the line
+        //     TurnRight(PWR); // hoping turning right will point the robot in the correct direction
+        //     senario=6;
+        // }
+
+
+        // if (leftSeesBrown==true && middleSeesBrown==true && rightSeesBrown== true){
+        //         motorPower(RightMotor,PWR);
+        //         motorPower(LeftMotor,PWR);                                                     // robot perpendicular to line
+        //     delay(50);
+        //     TurnRight(PWR);
+        //     senario=7;
+        // }
 
 
         // if (leftSeesBrown==true && middleSeesBrown==true && rightSeesBrown== true){
@@ -530,25 +560,27 @@ void linefollowing(){
         if (leftSeesBrown==false && middleSeesBrown==false && rightSeesBrown==true){
             TurnRight(PWR);
             // delay(50);
-                motorPower(RightMotor,PWR);                                                // compensateing for over turn to the left
-                motorPower(LeftMotor,PWR);
+                // motorPower(RightMotor,PWR);                                                // compensateing for over turn to the left
+                // motorPower(LeftMotor,PWR);
         }
 
 
         if (leftSeesBrown==true && middleSeesBrown==false && rightSeesBrown==false){
             TurnLeft(PWR);
             // delay(50);                                                                      // compensating for over turn to the right
-                motorPower(RightMotor,PWR);
-                motorPower(LeftMotor,PWR);
+            //     motorPower(RightMotor,PWR);
+            //     motorPower(LeftMotor,PWR);
         }
 
 
         if ( leftSeesBlack==true && middleSeesBlack== true && rightSeesBlack== true){
             stop();
+            senario=9;
             break;                                                                          // sees balck
         }
 
-
+        delay(50);
+        lcd_print(4,"%d",senario);
     }
     stop();
 

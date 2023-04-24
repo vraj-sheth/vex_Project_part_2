@@ -557,20 +557,20 @@ void linefollowing(){
         // }
 
 
-        if (leftSeesBrown==false && middleSeesBrown==false && rightSeesBrown==true){
-            TurnRight(PWR);
-            // delay(50);
-                // motorPower(RightMotor,PWR);                                                // compensateing for over turn to the left
-                // motorPower(LeftMotor,PWR);
-        }
+        // if (leftSeesBrown==false && middleSeesBrown==false && rightSeesBrown==true){
+        //     TurnRight(PWR);
+        //     // delay(50);
+        //         // motorPower(RightMotor,PWR);                                                // compensateing for over turn to the left
+        //         // motorPower(LeftMotor,PWR);
+        // }
 
 
-        if (leftSeesBrown==true && middleSeesBrown==false && rightSeesBrown==false){
-            TurnLeft(PWR);
-            // delay(50);                                                                      // compensating for over turn to the right
-            //     motorPower(RightMotor,PWR);
-            //     motorPower(LeftMotor,PWR);
-        }
+        // if (leftSeesBrown==true && middleSeesBrown==false && rightSeesBrown==false){
+        //     TurnLeft(PWR);
+        //     // delay(50);                                                                      // compensating for over turn to the right
+        //     //     motorPower(RightMotor,PWR);
+        //     //     motorPower(LeftMotor,PWR);
+        // }
 
 
         if ( leftSeesBlack==true && middleSeesBlack== true && rightSeesBlack== true){

@@ -31,16 +31,34 @@ double pivotWheelRatio = 114.0;    // number of encoder ticks per 1 revolution o
 /* Write your code in the function below. You may add helper functions below the studentCode function. */
 void student_Main(){
 {
-//drivePcont ( 600.0,1.2,0.08);
+    //  armUp(5000);
+    // resetEncoder(ArmEncoder);
+// drivePcont ( 300.0,2.6,0.08);
+// delay(3000);
+// drivePcont ( -300.0,1.3,0.1);
+
+
 //driveUntilBlack(40.0);
 
-//rotateAngle(0.8,90.0);
-
-//moveArmAngle(20.0,2.0);
+//rotateAngle(0.8,-90.0);
+// //armUp(4000);
+// lcd_print(1,"hfdbjfdbfj");
+// moveArmAngle(0.0, 2.0);
+// delay(3000);
+// lcd_print(4,"hfdbjfdbfj");
+// moveArmAngle(30.0,2.0);
 //turnRobot(90.0,2,0.8);
 //turnPcont(90.0,2000.0);
 
-linefollowing();
+// linefollowing();
+drive_to_can(300);
+
+// rotateAngle(20.0, 90.0);
+// delay(3000);
+// rotateAngle(20.0, -180);
+
+
+
    
 }
 
@@ -62,19 +80,20 @@ int convertPower(double power_input){
 
 //drive given distance function//
 void drivePcont (double target,double Kp,double Ki){
-    double currentPos,error,u=0;
+    double currentPos,u=0;
     int Pwr=0;
     int i=0;
+    int error=0;
 
 
     resetEncoder(LeftEncoder);
     resetEncoder(RightEncoder);
 
-    while(currentPos<target){
+    while(currentPos<=abs(target)){
     int L_encoder=readSensor(LeftEncoder);
     int R_encoder=readSensor(RightEncoder);
 
-    double avg_encoder_count= (L_encoder+R_encoder)/2;
+    double avg_encoder_count= abs(L_encoder+R_encoder)/2;
     
     currentPos=0.3593*avg_encoder_count;    
 
@@ -82,8 +101,8 @@ void drivePcont (double target,double Kp,double Ki){
 
     i=i+error;
     u=(Kp*error + Ki*i);
-    double differance=(L_encoder-R_encoder)*7;
-    Pwr=(int) saturate(u,-3500,3500);
+    double differance=(L_encoder-R_encoder)*7; 
+    Pwr=(int) saturate(u,-3000,3000);
 
     motorPower(LeftMotor, Pwr - differance);
     motorPower(RightMotor, Pwr + differance);
@@ -154,9 +173,9 @@ void drive_to_can(int stopping_distance){
     
     double d2can = readSensor(SonarSensor);
 
-    double end_distnace = d2can-stopping_distance;
+    double end_distance = (d2can+20)-stopping_distance;
 
-    drivePcont(end_distnace,1.0,1.0);
+    drivePcont(end_distance,1.0,1.0);
     
 }    
 
@@ -174,6 +193,7 @@ void rotateAngle(double Kp, double targetAngle){
     double distance_to_travel=(targetAngle)/360.0*pivotCircle;
     double v1,v2;
     double diff;
+
     resetEncoder(LeftEncoder);
     resetEncoder(RightEncoder);
 
@@ -182,25 +202,36 @@ void rotateAngle(double Kp, double targetAngle){
         rightencCount=readSensor(RightEncoder);
         left_dis=leftencCount*0.3593;
         right_dis=rightencCount*0.3593;
-        average_distance_traveled=(fabs(left_dis)+fabs(right_dis))/2.0;
 
-        diff=fabs(left_dis)-fabs(right_dis);
+        //Averages the left and right encoder count
+        average_distance_traveled=(fabs(left_dis)+fabs(right_dis))/2.0; 
+        
+        // Calculates the difference between the left and right wheel encoders
+        diff=fabs(left_dis)-fabs(right_dis); 
 
-        error=distance_to_travel-fabs(average_distance_traveled);
+        if(distance_to_travel <= 0){
 
-        pwr=Kp*error;
+            error = (-distance_to_travel) - fabs(average_distance_traveled);
+            pwr=Kp*-error;
+        }
+        else{ 
 
- 
+            error= distance_to_travel - fabs(average_distance_traveled);
+            pwr=Kp*error;
 
-        v1=convertPower(pwr)*5;
-        v2=convertPower(diff)*5;
+        }
+
+
+        //Need to change voltage to power percentage
+        v1=convertPower(pwr);
+        v2=convertPower(diff);
        
-        motorPower(LeftMotor,v1*-1);
+        motorPower(LeftMotor,v1*-1); //Anticlockwise is positive 
         motorPower(RightMotor,(v1+v2));
         delay(50);
-        // if (fabs(average_distance_traveled)==distance_to_travel){
-        //     break;
-        // }
+        if (fabs(average_distance_traveled)>=distance_to_travel){
+             break;
+         }
         
     }while(1);
 
@@ -258,10 +289,10 @@ void driveUntilBlack(double precent_power){
     double currentAngle=0.0;
     double Pwr=0.0;
 
-    armUp(5000);
-    resetEncoder(ArmEncoder);
+    // armUp(5000);
+    // resetEncoder(ArmEncoder);
     
-    while(error<0.2){
+    while(abs(error)<5){
         int currnetArmEnc=readSensor(ArmEncoder);
         currentAngle=((currnetArmEnc*360)/(7*900))+41; // 56 is the angle of the arm at top position
         error=Angle-currentAngle;
@@ -401,7 +432,7 @@ void stop(){
 
 void linefollowing(){
 
-    double PWR=1200.0;
+    double PWR=2000.0;
     double brownUpperIm= 2200.0;
     double brownLowerLim= 2000.0;
 
@@ -464,7 +495,6 @@ void linefollowing(){
 
         if(leftSeesBrown==false && middleSeesBrown== true && rightSeesBrown==true){
             TurnRight(PWR);
-            delay(50);
                 motorPower(RightMotor,PWR);                                                //90 to the right
                 motorPower(LeftMotor,PWR);
         }
@@ -472,43 +502,44 @@ void linefollowing(){
 
         if(leftSeesBrown==true && middleSeesBrown==true && rightSeesBrown==false){
             TurnLeft(PWR);
-            delay(50);                                                                      //90 to the left
+            //delay(50);                                                                      //90 to the left
                 motorPower(RightMotor,PWR);
                 motorPower(LeftMotor,PWR);
         }
 
 
         if (leftSeesBrown==false && middleSeesBrown==false && rightSeesBrown==false){                   //not on the line
-            TurnRight(PWR); // hoping turning right will point the robot in the correct direction
-        }
-
-
-        if (leftSeesBrown==true && middleSeesBrown==true && rightSeesBrown== true){
-                motorPower(RightMotor,PWR);
-                motorPower(LeftMotor,PWR);                                                     // robot perpendicular to line
-            delay(50);
             TurnRight(PWR);
+            delay(50); // hoping turning right will point the robot in the correct direction
         }
 
 
-        if (leftSeesBrown==true && middleSeesBrown==false && rightSeesBrown==true){
-            TurnRight(PWR); //robot is wedged in corner, hoping turning right will fix it        // stuck in corner
-        }
+        // if (leftSeesBrown==true && middleSeesBrown==true && rightSeesBrown== true){
+        //         motorPower(RightMotor,PWR);
+        //         motorPower(LeftMotor,PWR);                                                     // robot perpendicular to line
+        //     //delay(50);
+        //     TurnRight(PWR);
+        // }
+
+
+        // if (leftSeesBrown==true && middleSeesBrown==false && rightSeesBrown==true){
+        //     TurnRight(PWR); //robot is wedged in corner, hoping turning right will fix it        // stuck in corner
+        // }
 
 
         if (leftSeesBrown==false && middleSeesBrown==false && rightSeesBrown==true){
             TurnRight(PWR);
             // delay(50);
-                // motorPower(RightMotor,PWR);                                                // compensateing for over turn to the left
-                // motorPower(LeftMotor,PWR);
+                motorPower(RightMotor,PWR);                                                // compensateing for over turn to the left
+                motorPower(LeftMotor,PWR);
         }
 
 
         if (leftSeesBrown==true && middleSeesBrown==false && rightSeesBrown==false){
             TurnLeft(PWR);
             // delay(50);                                                                      // compensating for over turn to the right
-            //     motorPower(RightMotor,PWR);
-            //     motorPower(LeftMotor,PWR);
+                motorPower(RightMotor,PWR);
+                motorPower(LeftMotor,PWR);
         }
 
 

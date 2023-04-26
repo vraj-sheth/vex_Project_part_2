@@ -1,7 +1,7 @@
 {
   "py/object": "pros.conductor.project.Project",
   "py/state": {
-    "project_name": "can",
+    "project_name": "vshe779",
     "target": "v5",
     "templates": {
       "kernel": {

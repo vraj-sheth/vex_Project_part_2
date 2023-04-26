@@ -52,7 +52,7 @@ void student_Main(){
 
  linefollowing();
 
- //turnAngle1(90.0,0.8);
+ //turnAngle1(90.0,4.0);
 //drive_to_can(300);
 
 // rotateAngle(20.0, 90.0);
@@ -389,7 +389,7 @@ void linefollowing(){
 
     double PWR=2000.0;
     double brownUpperIm= 2200.0;
-    double brownLowerLim= 2000.0;
+    double brownLowerLim= 1800.0;
 
 
     double blackUpperLim= 2700.0;
@@ -413,6 +413,7 @@ void linefollowing(){
         int rightSeesBlack= false;
 
         int last_turn;
+        int sin_case; 
 
 
 // Brown TF readings
@@ -446,51 +447,69 @@ void linefollowing(){
         //sensor conditions
         if (leftSeesBrown==false && middleSeesBrown== true && rightSeesBrown== false){// middle sees brown 
                 driveStriaght(PWR);
+                sin_case=1;
         }
 
         if (leftSeesBrown==false && middleSeesBrown==false && rightSeesBrown==true){// right sees brown
-            TurnRight(PWR);
+            motorPower(RightMotor,(-PWR*0.945));
+            motorPower(LeftMotor,(PWR));
             last_turn=2;
             // delay(50);
-              
+              sin_case=2;
         }
 
 
         if (leftSeesBrown==true && middleSeesBrown==false && rightSeesBrown==false){// left sees brown
-            TurnLeft(PWR);
+            motorPower(RightMotor,(PWR*0.945));
+            motorPower(LeftMotor,(-PWR));
             last_turn=1;
+            sin_case=3;
             // delay(50);                                                                     
              
         }
 
         if(leftSeesBrown==false && middleSeesBrown== true && rightSeesBrown==true){// middle and right see brown
-            TurnRight(PWR);
+            motorPower(RightMotor,-PWR*0.945);
+            motorPower(LeftMotor,PWR);
+            sin_case=4;
                
         }
 
 
         if(leftSeesBrown==true && middleSeesBrown==true && rightSeesBrown==false){// left nad middle see brown
-            TurnLeft(PWR);
+           motorPower(RightMotor,PWR*0.945);
+           motorPower(LeftMotor,-PWR);
+           sin_case=5;
             //delay(50);                                                                      //90 to the left
                
         }
 
 
-        if (leftSeesBrown==false && middleSeesBrown==false && rightSeesBrown==false ){//none see brown
-            driveStriaght(-PWR);
+        if (leftSeesBrown==false && middleSeesBrown==false && rightSeesBrown==false && last_turn==1){//none see brown
+            TurnLeft(PWR);
+        sin_case=6;
+        }
+
+        if (leftSeesBrown==false && middleSeesBrown==false && rightSeesBrown==false && last_turn==2){//none see brown
+            TurnRight(PWR);
+        sin_case=87;
         }
 
 
+
         if (leftSeesBrown==true && middleSeesBrown==true && rightSeesBrown== true){// all see brown
-                motorPower(RightMotor,PWR);
-                motorPower(LeftMotor,PWR);                                                     
+                                                               
             //delay(50);
-            TurnRight(PWR);
+            motorPower(RightMotor,-PWR*0.945);
+            motorPower(LeftMotor,PWR);
+            sin_case=7;
         }
 
 
         if (leftSeesBrown==true && middleSeesBrown==false && rightSeesBrown==true){// left and right see brown
-            TurnRight(PWR); // add previous sensor reading and depending on that turn right or left      
+            motorPower(RightMotor,-PWR*0.945);
+            motorPower(LeftMotor,PWR); // add previous sensor reading and depending on that turn right or left      
+            sin_case=8;
         }
 
 
@@ -499,10 +518,12 @@ void linefollowing(){
 
         if ( leftSeesBlack==true || middleSeesBlack== true || rightSeesBlack== true){// any see black
             stop();
-            break;                                                                       
+            break; 
+            sin_case=9;                                                                      
         }
-
+        lcd_print(3,"%d",sin_case);
         delay(50);
+
     }
     stop();
 
@@ -522,6 +543,7 @@ void turnAngle1(float angle, float Kp){
 	float error, circumference, Distance, AngleTurn_ratio, ArcLength_ratio, u = 0;
 	int r = 103; //radius of turning circle of the robot in mm
 	int power = 0;  //wheel power variable
+    int L_Encoder_Count,R_Encoder_Count;
 
 
 	circumference = 2*PI*r; //circumference of turning circle in mm
@@ -539,8 +561,11 @@ void turnAngle1(float angle, float Kp){
 			Distance = (((readSensor(RightEncoder)) + abs(readSensor(LeftEncoder)))/2)*0.3593;
 
 			ArcLength_ratio = Distance/circumference;
-			error = AngleTurn_ratio - ArcLength_ratio;
-
+            L_Encoder_Count = readSensor(LeftEncoder);
+            R_Encoder_Count = readSensor(RightEncoder);
+            error = R_Encoder_Count - L_Encoder_Count; 
+			//error = AngleTurn_ratio - ArcLength_ratio;
+            lcd_print(2,"%d",error);
 			u = Kp*error;
 			power = (int)saturate(u, 3000, -3000);  
 			motorPower(LeftMotor, power);
@@ -552,10 +577,13 @@ void turnAngle1(float angle, float Kp){
 
 
 		do{
-			Distance = count_to_mm((abs(readSensor(RightEncoder)) + readSensor(LeftEncoder))/2);
+			Distance = (((abs(readSensor(RightEncoder)) + readSensor(LeftEncoder))/2))*0.3593;
 			ArcLength_ratio = Distance/circumference;
-			error = AngleTurn_ratio - ArcLength_ratio;
+			L_Encoder_Count = readSensor(LeftEncoder);
+            R_Encoder_Count = readSensor(RightEncoder);
+            error = R_Encoder_Count - L_Encoder_Count; 
 			u = Kp*error;
+            lcd_print(2,"%d",error);
 			power = (int)saturate(u, 3000, -3000);  
 			motorPower(LeftMotor, -power);
 			motorPower(RightMotor, power);

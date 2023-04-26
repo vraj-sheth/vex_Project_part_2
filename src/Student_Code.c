@@ -79,7 +79,7 @@ int convertPower(double power_input){
 }
 
 //drive given distance function//
-void drivePcont (double target,double Kp,double Ki){
+void drivePcont (double target,double Kp,double Ki){// 0.35kp 0.01ki
     double currentPos,u=0;
     int Pwr=0;
     int i=0;
@@ -89,7 +89,7 @@ void drivePcont (double target,double Kp,double Ki){
     resetEncoder(LeftEncoder);
     resetEncoder(RightEncoder);
 
-    while(currentPos<=abs(target)){
+    do{
         int L_encoder=readSensor(LeftEncoder);
         int R_encoder=readSensor(RightEncoder);
 
@@ -100,14 +100,14 @@ void drivePcont (double target,double Kp,double Ki){
         error=target-currentPos;
 
         //Stop integrator wind up
-        if( abs(u) =< 100){
+        if( abs(u) <= 100){
             i=i+error;
         }
  
         u=(Kp*error + Ki*i); // Divide Kp by 50 when called - allows u to be a percentage equivalent of mv
 
 
-        double differance=(L_encoder-R_encoder)*7; //Why is there a 7
+        double differance=(L_encoder-R_encoder)*10; //Why is there a 7
     
         Pwr = convertPower(u);
 
@@ -117,7 +117,7 @@ void drivePcont (double target,double Kp,double Ki){
         // motorPower(LeftMotor,Pwr);
         // motorPower(RightMotor,Pwr);
         delay(50);
-    }
+    }while((currentPos+5)<=(abs(target)));
 
     motorPower(LeftMotor,0);
     motorPower(RightMotor,0);
@@ -319,43 +319,6 @@ void driveUntilBlack(double precent_power){
 
 
 
-
-void turnRobot(double angle,  double Kp, double Ki) {
-
-  double angleInRadians = fabs(angle) * 3.14159265359 / 180.0;
-
-  double Arcdistance = angleInRadians * 125.0;
-
-  double error = angle;
-  double i = 0;             //consider making the power = to the kp* the error, and define the error earlier on.
-
-
-  motorPower(LeftMotor, (Kp*error));
-  motorPower(RightMotor, -(Kp*error));
-
-  while (fabs(error) < 0.1) { // the 0.1 is the tolerance
-    int leftEncoderValue = readSensor(LeftEncoder);
-    int rightEncoderValue = readSensor(RightEncoder);
-
-    double leftDistance = leftEncoderValue * 0.103 * PI; //the 0.103 is the wheel diameter in m
-    double rightDistance = rightEncoderValue * 0.103 * PI;
-
-    error = (leftDistance - rightDistance) - Arcdistance;
-
-    i =i + error;
-
-    double u = Kp*error+Ki*i;
-
-    motorPower(LeftMotor,u);
-    motorPower(RightMotor,-u);
-  }
-
-  motorPower(LeftMotor, 0);
-  motorPower(RightMotor, 0);
-
-}
-
-
 void turnPcont(double targetAngle, double Kp){
   // Intialise variables
   double error, U = 0;
@@ -416,21 +379,21 @@ void turnPcont(double targetAngle, double Kp){
 
 // defining functions for line following
 void driveStriaght( double voltage){
-    motorPower(RightMotor,3500);
-    motorPower(LeftMotor,3500);
+    motorPower(RightMotor,voltage*0.945);
+    motorPower(LeftMotor,voltage);
 
 
 }
 
 
 void TurnRight (double voltage){
-    motorPower(RightMotor,-voltage);
+    motorPower(RightMotor,-voltage*0.945);
     motorPower(LeftMotor,voltage);
 }
 
 
 void TurnLeft(double voltage){
-    motorPower(RightMotor,voltage);
+    motorPower(RightMotor,voltage*0.945);
     motorPower(LeftMotor,-voltage);
 }
 
@@ -468,6 +431,8 @@ void linefollowing(){
         int middleSeesBlack= false;
         int rightSeesBlack= false;
 
+        int last_turn;
+
 
 // Brown TF readings
         if (s1>=brownLowerLim && s1<=brownUpperIm){
@@ -498,68 +463,65 @@ void linefollowing(){
 
 
         //sensor conditions
-        if (leftSeesBrown==false && middleSeesBrown== true && rightSeesBrown== false){
-                motorPower(RightMotor,PWR);                                                // middle sees brown
-                motorPower(LeftMotor,PWR);
+        if (leftSeesBrown==false && middleSeesBrown== true && rightSeesBrown== false){// middle sees brown 
+                driveStriaght(PWR);
         }
 
-
-        if(leftSeesBrown==false && middleSeesBrown== true && rightSeesBrown==true){
+        if (leftSeesBrown==false && middleSeesBrown==false && rightSeesBrown==true){// right sees brown
             TurnRight(PWR);
-                motorPower(RightMotor,PWR);                                                //90 to the right
-                motorPower(LeftMotor,PWR);
+            last_turn=2;
+            // delay(50);
+              
         }
 
 
-        if(leftSeesBrown==true && middleSeesBrown==true && rightSeesBrown==false){
+        if (leftSeesBrown==true && middleSeesBrown==false && rightSeesBrown==false){// left sees brown
+            TurnLeft(PWR);
+            last_turn=1;
+            // delay(50);                                                                     
+             
+        }
+
+        if(leftSeesBrown==false && middleSeesBrown== true && rightSeesBrown==true){// middle and right see brown
+            TurnRight(PWR);
+               
+        }
+
+
+        if(leftSeesBrown==true && middleSeesBrown==true && rightSeesBrown==false){// left nad middle see brown
             TurnLeft(PWR);
             //delay(50);                                                                      //90 to the left
+               
+        }
+
+
+        if (leftSeesBrown==false && middleSeesBrown==false && rightSeesBrown==false ){//none see brown
+            driveStriaght(-PWR);
+        }
+
+
+        if (leftSeesBrown==true && middleSeesBrown==true && rightSeesBrown== true){// all see brown
                 motorPower(RightMotor,PWR);
-                motorPower(LeftMotor,PWR);
-        }
-
-
-        if (leftSeesBrown==false && middleSeesBrown==false && rightSeesBrown==false){                   //not on the line
+                motorPower(LeftMotor,PWR);                                                     
+            //delay(50);
             TurnRight(PWR);
-            delay(50); // hoping turning right will point the robot in the correct direction
         }
 
 
-        // if (leftSeesBrown==true && middleSeesBrown==true && rightSeesBrown== true){
-        //         motorPower(RightMotor,PWR);
-        //         motorPower(LeftMotor,PWR);                                                     // robot perpendicular to line
-        //     //delay(50);
-        //     TurnRight(PWR);
-        // }
-
-
-        // if (leftSeesBrown==true && middleSeesBrown==false && rightSeesBrown==true){
-        //     TurnRight(PWR); //robot is wedged in corner, hoping turning right will fix it        // stuck in corner
-        // }
-
-
-        if (leftSeesBrown==false && middleSeesBrown==false && rightSeesBrown==true){
-            TurnRight(PWR);
-            // delay(50);
-                motorPower(RightMotor,PWR);                                                // compensateing for over turn to the left
-                motorPower(LeftMotor,PWR);
+        if (leftSeesBrown==true && middleSeesBrown==false && rightSeesBrown==true){// left and right see brown
+            TurnRight(PWR); // add previous sensor reading and depending on that turn right or left      
         }
 
 
-        if (leftSeesBrown==true && middleSeesBrown==false && rightSeesBrown==false){
-            TurnLeft(PWR);
-            // delay(50);                                                                      // compensating for over turn to the right
-                motorPower(RightMotor,PWR);
-                motorPower(LeftMotor,PWR);
-        }
+       
 
 
-        if ( leftSeesBlack==true && middleSeesBlack== true && rightSeesBlack== true){
+        if ( leftSeesBlack==true || middleSeesBlack== true || rightSeesBlack== true){// any see black
             stop();
-            break;                                                                          // sees balck
+            break;                                                                       
         }
 
-
+        delay(50);
     }
     stop();
 

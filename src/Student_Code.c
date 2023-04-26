@@ -51,6 +51,8 @@ void student_Main(){
 //turnPcont(90.0,2000.0);
 
  linefollowing();
+
+ //turnAngle1(90.0,0.8);
 //drive_to_can(300);
 
 // rotateAngle(20.0, 90.0);
@@ -516,15 +518,11 @@ void linefollowing(){
 
 void turnAngle1(float angle, float Kp){
 
-// We are defining the appropriate variables here.
 
 	float error, circumference, Distance, AngleTurn_ratio, ArcLength_ratio, u = 0;
 	int r = 103; //radius of turning circle of the robot in mm
 	int power = 0;  //wheel power variable
 
-// We are using the arc length formula here: s = r*theta, to calculate how far we have turned. We find ther circumference of the robot
-// and then we find the fraction of the circle the robot has covered, taking the absolute value for negative values (going clockwise).
-// We then reset the wheel encoders to 0.
 
 	circumference = 2*PI*r; //circumference of turning circle in mm
 	AngleTurn_ratio = abs(angle/360);
@@ -538,10 +536,7 @@ void turnAngle1(float angle, float Kp){
 
 		do{
 
-
 			Distance = (((readSensor(RightEncoder)) + abs(readSensor(LeftEncoder)))/2)*0.3593;
-
-
 
 			ArcLength_ratio = Distance/circumference;
 			error = AngleTurn_ratio - ArcLength_ratio;

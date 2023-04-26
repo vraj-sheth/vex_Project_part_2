@@ -50,8 +50,8 @@ void student_Main(){
 //turnRobot(90.0,2,0.8);
 //turnPcont(90.0,2000.0);
 
-// linefollowing();
-drive_to_can(300);
+ linefollowing();
+//drive_to_can(300);
 
 // rotateAngle(20.0, 90.0);
 // delay(3000);
@@ -123,31 +123,10 @@ void drivePcont (double target,double Kp,double Ki){// 0.35kp 0.01ki
     motorPower(RightMotor,0);
 }
 
-/*void drivePcont(float target, float Kp){
-
-float currentPos, error, u = 0;
-int Pwr = 0;
-
-resetEncoder(LeftEncoder);
-resetEncoder(RightEncoder);
-
-do{
-    
-    int L_encoder=readSensor(LeftEncoder);
-    int R_encoder=readSensor(RightEncoder);
-
-    double avg_encoder_count= (L_encoder+R_encoder)/2;
-    
-    currentPos=0.3593*avg_encoder_count;
 
 
 
 
-}
-
-
-
-}*/
 
 
 

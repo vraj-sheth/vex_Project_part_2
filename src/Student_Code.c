@@ -514,7 +514,60 @@ void linefollowing(){
 
 // i really hope these functions work 
 
+void turnAngle1(float angle, float Kp){
 
+// We are defining the appropriate variables here.
+
+	float error, circumference, Distance, AngleTurn_ratio, ArcLength_ratio, u = 0;
+	int r = 103; //radius of turning circle of the robot in mm
+	int power = 0;  //wheel power variable
+
+// We are using the arc length formula here: s = r*theta, to calculate how far we have turned. We find ther circumference of the robot
+// and then we find the fraction of the circle the robot has covered, taking the absolute value for negative values (going clockwise).
+// We then reset the wheel encoders to 0.
+
+	circumference = 2*PI*r; //circumference of turning circle in mm
+	AngleTurn_ratio = abs(angle/360);
+
+	resetEncoder(LeftEncoder);
+    resetEncoder(RightEncoder);
+
+	if (angle > 0){
+
+// If the angle > 0, then we have to turn anti-clockwise.
+
+		do{
+
+
+			Distance = (((readSensor(RightEncoder)) + abs(readSensor(LeftEncoder)))/2)*0.3593;
+
+
+
+			ArcLength_ratio = Distance/circumference;
+			error = AngleTurn_ratio - ArcLength_ratio;
+
+			u = Kp*error;
+			power = (int)saturate(u, 3000, -3000);  
+			motorPower(LeftMotor, power);
+			motorPower(RightMotor, -power);
+			delay(100);
+		}while (u > 0);
+	}
+	else{
+
+
+		do{
+			Distance = count_to_mm((abs(readSensor(RightEncoder)) + readSensor(LeftEncoder))/2);
+			ArcLength_ratio = Distance/circumference;
+			error = AngleTurn_ratio - ArcLength_ratio;
+			u = Kp*error;
+			power = (int)saturate(u, 3000, -3000);  
+			motorPower(LeftMotor, -power);
+			motorPower(RightMotor, power);
+			delay(100);
+		}while (u > 0);
+	}
+}
 
 
 

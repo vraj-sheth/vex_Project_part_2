@@ -179,7 +179,7 @@ void rotateAngle(double Kp, double targetAngle){
     double average_distance_traveled;
     double pivotDiameter=robotWidth-22.0;
     double pivotCircle= pivotDiameter*PI;
-    double distance_to_travel= fabs(targetAngle)/360.0*pivotCircle;
+    double distance_to_travel= (targetAngle)/360.0*pivotCircle;
     double v1,v2;
     double diff;
 
@@ -196,23 +196,24 @@ void rotateAngle(double Kp, double targetAngle){
         average_distance_traveled=(fabs(left_dis)+fabs(right_dis))/2.0; 
         
         // Calculates the difference between the left and right wheel encoders
-        diff=fabs(left_dis)-fabs(right_dis); //Implement second controller
+        diff=((left_dis)-(right_dis))/100.0; //Implement second controller
 
-        error = distance_to_travel - fabs(average_distance_traveled);
+        error = distance_to_travel - (average_distance_traveled);
 
-        if (targetAngle < 0){
-            pwr = -error * Kp;
-        }
-        else{
-            pwr = error * Kp;
+        // if (targetAngle < 0){
+        //     pwr = -error * Kp;
+        // }
+        // else{
+        //     pwr = error * Kp;
 
-        }
+        // }
         //Need to change voltage to power percentage
         v1=convertPower(pwr);
         v2=convertPower(diff);
+        // add saturation
        
-        motorPower(LeftMotor,v1*-1); //Anticlockwise is positive 
-        motorPower(RightMotor,(v1+v2));
+        motorPower(LeftMotor,v1); //Anticlockwise is positive 
+        motorPower(RightMotor,-(v1+v2));
         
         if (average_distance_traveled >= distance_to_travel){
             break;

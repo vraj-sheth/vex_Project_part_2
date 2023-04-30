@@ -219,6 +219,54 @@ void rotateAngle(double Kp, double targetAngle){
     motorPower(RightMotor,0);
 
 }
+// void rotateAngle(double Kp, double targetAngle) {
+//     int leftencCount, rightencCount;
+//     double left_dis, right_dis;
+//     double error;
+//     double power, diff;
+//     double average_distance_traveled;
+//     double pivotDiameter = robotWidth - 22.0;
+//     double pivotCircle = pivotDiameter * PI;
+//     double distance_to_travel = (targetAngle / 360.0) * pivotCircle;
+//     double v1, v2;
+
+//     resetEncoder(LeftEncoder);
+//     resetEncoder(RightEncoder);
+
+//     do {
+//         leftencCount = readSensor(LeftEncoder);
+//         rightencCount = readSensor(RightEncoder);
+//         left_dis = encTodistance(leftencCount); //leftencCount*0.3593;
+//         right_dis = encTodistance(rightencCount);//rightencCount*0.3593;
+
+//         // Averages the left and right encoder count
+//         average_distance_traveled = (fabs(left_dis) + fabs(right_dis)) / 2.0;
+
+//         error = distance_to_travel - average_distance_traveled;
+
+//         // Calculates the difference between the left and right wheel encoders
+//         diff = (left_dis - right_dis) / 100.0;
+
+//         power = Kp * error;
+//         v1 = convertPower(power);
+//         v2 = convertPower(Kp * diff);
+
+
+//         motorPower(LeftMotor, v1); // Anticlockwise is positive
+//         motorPower(RightMotor, -(v1 + v2));
+
+//         if (fabs(error) < 0.1) {
+//             break;
+//         }
+
+//         delay(50);
+
+//     } while (1);
+
+//     motorPower(LeftMotor, 0);
+//     motorPower(RightMotor, 0);
+// }
+
 
 
 void driveUntilBlack(double precent_power){

@@ -194,11 +194,19 @@ void rotateAngle(double Kp, double targetAngle){
 
         //Averages the left and right encoder count
         average_distance_traveled=(fabs(left_dis)+fabs(right_dis))/2.0; 
+
+        if (targetAngle<0){
+            
+            error = distance_to_travel + (average_distance_traveled);
+        }
+        else if ( targetAngle>0){
+
+        error = distance_to_travel - (average_distance_traveled);
+        }
         
         // Calculates the difference between the left and right wheel encoders
         diff=((left_dis)-(right_dis))/100.0; //Implement second controller
 
-        error = distance_to_travel - (average_distance_traveled);
 
         // if (targetAngle < 0){
         //     pwr = -error * Kp;

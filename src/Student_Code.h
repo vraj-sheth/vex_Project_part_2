@@ -11,7 +11,6 @@ int convertPower(double power_input);
 // void driveStraight(double Kp, double Ki, double power);
 
 void drivePcont (double target, double Kp, double Ki);
-
 double encTodistance (int enc_count);
 void drive_to_can(int stopping_distance);
 

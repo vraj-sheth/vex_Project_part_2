@@ -76,8 +76,6 @@ int convertPower(double power_input){
   // return the voltage value.
   return voltage;
 
-
-
 }
 
 //drive given distance function//
@@ -97,7 +95,7 @@ void drivePcont (double target,double Kp,double Ki){// 0.35kp 0.01ki
 
         double avg_encoder_count= abs(L_encoder+R_encoder)/2;
         
-        currentPos=0.3593*avg_encoder_count;    
+        currentPos=encTodistance(avg_encoder_count); //0.3593*avg_encoder_count;    
 
         error=target-currentPos;
 
@@ -129,29 +127,12 @@ void drivePcont (double target,double Kp,double Ki){// 0.35kp 0.01ki
 
 
 
-
-
-
-/*int encTodistance (int L_encoder,int R_incoder){
-
-    double avg_count= (L_encoder+R_incoder)/2;
-
-    double distance_traveled= (avg_count/900)*pi*0.103;
-
-    int distance=(int)distance_traveled;
-
-    return distance;
-}*/
-
-
 // converting the enc to distance // 
-int encTodistance (int L_encoder,int R_incoder){
+double encTodistance (int enc_count){
+    double distance;
+    double Circumfrance= PI*drivingWheelDiameter;
 
-    double avg_count= (L_encoder+R_incoder)/2;
-
-    double distance_traveled= (avg_count/encCountPerRev)*3.14169265358979323846*(drivingWheelDiameter*10^-3);
-
-    int distance=(int)distance_traveled;
+    distance=enc_count*(Circumfrance/900);
 
     return distance;
 }
@@ -189,8 +170,8 @@ void rotateAngle(double Kp, double targetAngle){
     do{
         leftencCount=readSensor(LeftEncoder);
         rightencCount=readSensor(RightEncoder);
-        left_dis=leftencCount*0.3593;
-        right_dis=rightencCount*0.3593;
+        left_dis=encTodistance(leftencCount); //leftencCount*0.3593;
+        right_dis= encTodistance(rightencCount);//rightencCount*0.3593;
 
         //Averages the left and right encoder count
         average_distance_traveled=(fabs(left_dis)+fabs(right_dis))/2.0; 
@@ -326,7 +307,7 @@ void turnPcont(double targetAngle, double Kp){
 
   arc_length = (double) angleInRadians * 125.0; //pivotWheelRatio * (3.14159265359/180) * targetAngle;   //This converts the desired angle of rotation into mm
   
-  required_encoder_count = (arc_length / 0.3593) ; // Converts the desired arc length into encoder counts
+  required_encoder_count = (arc_length / 0.3595) ; // Converts the desired arc length into encoder counts
 
   lcd_print(2,"%d", arc_length);
 
@@ -567,7 +548,7 @@ void turnAngle1(float angle, float Kp){
 
 		do{
 
-			Distance = (((readSensor(RightEncoder)) + abs(readSensor(LeftEncoder)))/2)*0.3593;
+			Distance = (((readSensor(RightEncoder)) + abs(readSensor(LeftEncoder)))/2)*0.3595;
 
 			ArcLength_ratio = Distance/circumference;
             L_Encoder_Count = readSensor(LeftEncoder);
@@ -586,7 +567,7 @@ void turnAngle1(float angle, float Kp){
 
 
 		do{
-			Distance = (((abs(readSensor(RightEncoder)) + readSensor(LeftEncoder))/2))*0.3593;
+			Distance = (((abs(readSensor(RightEncoder)) + readSensor(LeftEncoder))/2))*0.3595;
 			ArcLength_ratio = Distance/circumference;
 			L_Encoder_Count = readSensor(LeftEncoder);
             R_Encoder_Count = readSensor(RightEncoder);

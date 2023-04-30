@@ -290,6 +290,34 @@ void driveUntilBlack(double precent_power){
     motorPower(ArmMotor,0);
 
  }
+// void moveArmAngle(double Angle, double kp){
+//     double u=0.0;
+//     double error=0.0;
+//     double currentAngle=0.0;
+//     double Pwr=0.0;
+//     double lastAngle = 0.0;
+//     resetTimer(T_1); // Reset timer T_1
+
+//     while(abs(error) <= 2 && readTimer(T_1) < 2000){ // Exit loop if angle doesn't change for 2 seconds
+//         int currnetArmEnc = readSensor(ArmEncoder);
+
+//         currentAngle = ((currnetArmEnc*360.0)/(7.0*900.0))+ 41.0;
+//         error = Angle - currentAngle;
+//         u = kp * error;
+
+//         Pwr = convertPower(u);
+//         motorPower(ArmMotor,Pwr);
+//         delay(50);
+
+//         // Check if angle has changed and reset timer
+//         if (abs(currentAngle - lastAngle) > 1.0) {
+//             lastAngle = currentAngle;
+//             resetTimer(T_1);
+
+//         }
+//     }
+//     motorPower(ArmMotor,0);
+// }
 
 
 

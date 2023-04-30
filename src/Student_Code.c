@@ -77,6 +77,16 @@ int convertPower(double power_input){
   return voltage;
 
 }
+// converting the enc to distance // 
+double encTodistance (int enc_count){
+    double distance;
+    double Circumfrance= PI*drivingWheelDiameter;
+
+    distance=enc_count*(Circumfrance/900);
+
+    return distance;
+}
+
 
 //drive given distance function//
 void drivePcont (double target,double Kp,double Ki){// 0.35kp 0.01ki
@@ -127,15 +137,7 @@ void drivePcont (double target,double Kp,double Ki){// 0.35kp 0.01ki
 
 
 
-// converting the enc to distance // 
-double encTodistance (int enc_count){
-    double distance;
-    double Circumfrance= PI*drivingWheelDiameter;
 
-    distance=enc_count*(Circumfrance/900);
-
-    return distance;
-}
 
 
 /// drive to can function //

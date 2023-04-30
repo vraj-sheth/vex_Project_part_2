@@ -12,7 +12,7 @@ int convertPower(double power_input);
 
 void drivePcont (double target, double Kp, double Ki);
 
-int encTodistance (int L_encoder,int R_incoder);
+double encTodistance (int enc_count);
 void drive_to_can(int stopping_distance);
 
 //void turnAngle (double Kp,double Ki,double degree);

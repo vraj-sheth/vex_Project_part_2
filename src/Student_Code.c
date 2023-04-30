@@ -199,6 +199,7 @@ void rotateAngle(double Kp, double targetAngle){
 
         // }
         //Need to change voltage to power percentage
+        pwr = error * Kp;
         v1=convertPower(pwr);
         v2=convertPower(diff);
         // add saturation

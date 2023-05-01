@@ -50,14 +50,14 @@ void student_Main(){
 //turnRobot(90.0,2,0.8);
 //turnPcont(90.0,2000.0);
 
- linefollowing();
+// linefollowing();
 
  //turnAngle1(90.0,4.0);
 //drive_to_can(300);
 
 // rotateAngle(20.0, 90.0);
 // delay(3000);
-// rotateAngle(20.0, -180);
+ rotateAngle(7.0, 90.0);
 
 
 
@@ -145,7 +145,7 @@ void drive_to_can(int stopping_distance){
     
     double d2can = readSensor(SonarSensor);
 
-    double end_distance = (d2can+20)-stopping_distance;
+    double end_distance = (d2can)-stopping_distance;
 
     drivePcont(end_distance,1.0,1.0);
     
@@ -200,17 +200,18 @@ void rotateAngle(double Kp, double targetAngle){
         // }
         //Need to change voltage to power percentage
         pwr = error * Kp;
-        v1=convertPower(pwr);
-        v2=convertPower(diff);
+
+        v1=convertPower(pwr/5);
+        v2=convertPower(diff/5);
         // add saturation
        
         motorPower(LeftMotor,v1); //Anticlockwise is positive 
         motorPower(RightMotor,-(v1+v2));
         
-        if (average_distance_traveled >= distance_to_travel){
+        if (fabs(error)<63.0){
             break;
         }
-
+        lcd_print(2,"%f",error);
         delay(50);
         
     }while(1);

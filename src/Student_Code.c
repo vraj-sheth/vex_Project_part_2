@@ -39,16 +39,16 @@ drivePcont(20.0,0.8,0.1);
 armUp(4000);
 double drive_back_dis=dis2can-460-20-673;
 drivePcont(drive_back_dis,0.8,0.1);
-rotateAngle(2.0,-90.0);
+rotateAngle(7.0,-90.0);
 driveUntilBlack(40.0);
 drivePcont(10.0,0.8,0.1);
 linefollowing();
 drivePcont(254.0,0.8,0.1);
 moveArmAngle(-15.0,2);
 drivePcont(-150.0,0.8,0.1);
-rotateAngle(2.0,-90.0);
+rotateAngle(7.0,-90.0);
 drivePcont(1308.0,0.8,0.1);
-rotateAngle(2.0,90.0);
+rotateAngle(7.0,90.0);
 drivePcont(100.0,0.8,0.1);
 }
 

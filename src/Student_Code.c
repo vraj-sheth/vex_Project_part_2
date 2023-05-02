@@ -31,37 +31,25 @@ double pivotWheelRatio = 114.0;    // number of encoder ticks per 1 revolution o
 /* Write your code in the function below. You may add helper functions below the studentCode function. */
 void student_Main(){
 {
-    //  armUp(5000);
-    // resetEncoder(ArmEncoder);
-// drivePcont ( 300.0,2.6,0.08);
-// delay(3000);
-// drivePcont ( -300.0,1.3,0.1);
-
-
-//driveUntilBlack(40.0);
-
-//rotateAngle(0.8,-90.0);
-// //armUp(4000);
-// lcd_print(1,"hfdbjfdbfj");
-// moveArmAngle(0.0, 2.0);
-// delay(3000);
-// lcd_print(4,"hfdbjfdbfj");
-// moveArmAngle(30.0,2.0);
-//turnRobot(90.0,2,0.8);
-//turnPcont(90.0,2000.0);
-
-// linefollowing();
-
- //turnAngle1(90.0,4.0);
-//drive_to_can(300);
-
-// rotateAngle(20.0, 90.0);
-// delay(3000);
- rotateAngle(7.0, 90.0);
-
-
-
-   
+double dis2can = readSensor(SonarSensor);
+delay(50);
+drive_to_can(320);
+moveArmAngle(-15.0,2.0);
+drivePcont(20.0,0.8,0.1);
+armUp(4000);
+double drive_back_dis=dis2can-460-20-673;
+drivePcont(drive_back_dis,0.8,0.1);
+rotateAngle(2.0,-90.0);
+driveUntilBlack(40.0);
+drivePcont(10.0,0.8,0.1);
+linefollowing();
+drivePcont(254.0,0.8,0.1);
+moveArmAngle(-15.0,2);
+drivePcont(-150.0,0.8,0.1);
+rotateAngle(2.0,-90.0);
+drivePcont(1308.0,0.8,0.1);
+rotateAngle(2.0,90.0);
+drivePcont(100.0,0.8,0.1);
 }
 
 }
@@ -318,12 +306,12 @@ void driveUntilBlack(double precent_power){
     double currentAngle=0.0;
     double Pwr=0.0;
 
-    // armUp(5000);
-    // resetEncoder(ArmEncoder);
+    armUp(5000);
+    resetEncoder(ArmEncoder);
     
 
     // Test with a different error threshold
-    while(abs(error)<=5){
+    while((currentAngle-5.0)>Angle){
         int currnetArmEnc=readSensor(ArmEncoder);
 
         //Why are we using 41??
@@ -339,6 +327,7 @@ void driveUntilBlack(double precent_power){
     motorPower(ArmMotor,0);
 
  }
+
 // void moveArmAngle(double Angle, double kp){
 //     double u=0.0;
 //     double error=0.0;

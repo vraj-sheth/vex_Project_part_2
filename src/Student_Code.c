@@ -40,7 +40,7 @@ delay(50);
 drivePcont(60.0,0.8,0.1);
 delay(50);
 armUp(4000);
-double drive_back_dis=dis2can-320-20-673-140+100;
+double drive_back_dis= dis2can-320-20-673-140+100;
 drivePcont(-drive_back_dis,0.8,0.1);
 delay(50);
 rotateAngle(7.0,90.0);

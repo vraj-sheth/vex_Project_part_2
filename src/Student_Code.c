@@ -34,13 +34,13 @@ void student_Main(){
 // double dis2can = readSensor(SonarSensor);
 // delay(50);
 // drive_to_can(320);
-// moveArmAngle(-15.0,2.0);
+// moveArmAngle(-13.5.0,2.0);
 // delay(50);
 // drivePcont(20.0,0.8,0.1);
 // delay(50);
 // armUp(4000);
-// double drive_back_dis=dis2can-20-673;
-// drivePcont(drive_back_dis,0.8,0.1);
+// double drive_back_dis=dis2can-320-20-673-140;
+// drivePcont(-drive_back_dis,0.8,0.1);
 // delay(50);
 // rotateAngle(7.0,-90.0);
 // delay(50);
@@ -52,7 +52,7 @@ void student_Main(){
 // delay(50);
 // drivePcont(254.0,0.8,0.1);
 // delay(50);
-// moveArmAngle(-15.0,2);
+// moveArmAngle(-13.5.0,2);
 // delay(50);
 // drivePcont(-150.0,0.8,0.1);
 // delay(50);

@@ -352,36 +352,30 @@ void rotateAngle(double Kp, double targetAngle){
 //     motorPower(RightMotor, 0);
 // }
 
-void armangle(double degrees, double Kp, int tolerance)    // possible if to make sure we dont put a value outside of our range (wont exit loop)
+void armangle(double targetAngle, double Kp, int tolerance)    // possible if to make sure we dont put a value outside of our range (wont exit loop)
 {
 
-
-// Intialising variables
-double currentarmpos;
+double currentAngle;
 double error;
-double voltage;
-double u;
-double x;
+double PWR;
+int enc_counts;
 
-// setting arm to highest postion 
 armUp(4000);
 
-// reseting arm encoder counts to 0
 resetEncoder(ArmEncoder);
 
-// using a do-while loop 
 do{
 
- int armcounts=readSensor(ArmEncoder);
+ enc_counts=readSensor(ArmEncoder);
 
-currentarmpos = (360.0/6300.0)*(armcounts) + 41.0;
-error= degrees-currentarmpos;
-u=Kp*error;
-voltage=convertPower(u);
-motorPower(ArmMotor,voltage);
+currentAngle = (360.0/6300.0)*(enc_counts) + 41.0;
+error= targetAngle-currentAngle;
+double u=Kp*error;
+PWR=convertPower(u);
+motorPower(ArmMotor,PWR);
 delay(50);
 }
-while(degrees<(currentarmpos-tolerance));
+while((currentAngle-tolerance) > targetAngle);
 
 motorPower(ArmMotor,0);
 

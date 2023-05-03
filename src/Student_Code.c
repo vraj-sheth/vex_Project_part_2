@@ -35,25 +35,25 @@ void student_Main(){
 double dis2can = readSensor(SonarSensor);
 delay(50);
 drive_to_can(320);
-moveArmAngle(-13.5,2.0);
+armangle(-15.5,5.0,3.0);
 delay(50);
-drivePcont(20.0,0.8,0.1);
+drivePcont(60.0,0.8,0.1);
 delay(50);
 armUp(4000);
-double drive_back_dis=dis2can-320-20-673-140;
+double drive_back_dis=dis2can-320-20-673-140+100;
 drivePcont(-drive_back_dis,0.8,0.1);
 delay(50);
-rotateAngle(7.0,-90.0);
+rotateAngle(7.0,90.0);
 delay(50);
 driveUntilBlack(40.0);
 delay(1000);
-drivePcont(10.0,0.8,0.1);
+drivePcont(60.0,0.8,0.1);
 delay(50);
 linefollowing();
 delay(50);
 drivePcont(254.0,0.8,0.1);// might need to edit
 delay(50);
-moveArmAngle(-13.5,2.0);
+armangle(-10.5,5.0,3.0);
 delay(50);
 drivePcont(-150.0,0.8,0.1);
 delay(50);
@@ -67,12 +67,18 @@ rotateAngle(7.0,90.0);
 delay(50);
 drivePcont(100.0,0.8,0.1);
 
-/////// testing for function in lab:
+// /////// testing for function in lab:
 
-moveArmAngle(0.0,2.0);
-delay(50);
-moveArmAngle(30.0,2.0);
-
+// //moveArmAngle(0.0,20.0);
+// // delay(50);
+// // moveArmAngle(30.0,20.0);
+// armangle(0.0,5.0,3.0);
+// delay(50);
+// // armangle(30.0,5.0,2.0);
+// rotateAngle(7.0,90.0);
+// delay(500);
+// linefollowing();
+// rotateAngle(7.0,-90.0);
 }
 
 }
@@ -129,7 +135,7 @@ void drivePcont (double target,double Kp,double Ki){// 0.35kp 0.01ki
 
 
         double differance=(L_encoder-R_encoder)*10; //Why is there a 7
-    
+        u = saturate(u,-60.0,60.0);
         Pwr = convertPower(u);
 
 
@@ -158,7 +164,7 @@ void drive_to_can(int stopping_distance){
 
     double end_distance = (d2can)-stopping_distance;
 
-    drivePcont(end_distance,1.0,1.0);
+    drivePcont(end_distance,0.35,0.1);
     
 }    
 
@@ -219,7 +225,7 @@ void rotateAngle(double Kp, double targetAngle){
         motorPower(LeftMotor,v1); //Anticlockwise is positive 
         motorPower(RightMotor,-(v1+v2));
         
-        if (fabs(error)<63.0){
+        if (fabs(error)<10.0){
             break;
         }
         lcd_print(2,"%f",error);
@@ -231,6 +237,73 @@ void rotateAngle(double Kp, double targetAngle){
     motorPower(RightMotor,0);
 
 }
+// James
+// void rotateAngle(double Kp, double targetAngle){
+//     int leftencCount, rightencCount;
+//     double i=0.0;
+//     double left_dis, right_dis;
+//     double error;
+//     double pwr;
+//     double average_distance_traveled;
+//     double pivotDiameter=robotWidth-22.0;
+//     double pivotCircle= pivotDiameter*PI;
+//     double distance_to_travel= fabs(targetAngle)/360.0*pivotCircle;
+//     double v1,v2;
+//     double diff;
+
+//     resetEncoder(LeftEncoder);
+//     resetEncoder(RightEncoder);
+
+//     do{
+//         leftencCount=readSensor(LeftEncoder);
+//         rightencCount=readSensor(RightEncoder);
+//         left_dis=leftencCount*0.3593;
+//         right_dis=rightencCount*0.3593;
+
+//         //Averages the left and right encoder count
+//         average_distance_traveled=(fabs(left_dis)+fabs(right_dis))/2.0; //Try using just one encoder
+        
+//         // Calculates the difference between the left and right wheel encoders
+//         diff=fabs(left_dis)-fabs(right_dis); //Implement second controller
+
+//         error = distance_to_travel - fabs(average_distance_traveled);
+
+//         if (targetAngle < 0){
+//             pwr = -error * Kp;
+//             lcd_print(2,"%f",pwr);
+//         }
+//         else{
+//             pwr = error * Kp;
+//             lcd_print(3,"%f",pwr);
+
+//         }
+//         //Need to change voltage to power percentage
+
+//         //Lower the amount of power first - reduce twitching
+//         pwr = saturate(pwr, -60, 60); 
+
+
+//         v1=convertPower(pwr);
+//         v2=convertPower(diff);
+       
+//         motorPower(LeftMotor,v1); //Clockwise  is positive - CHANGE BEFORE SUBMITION
+//         motorPower(RightMotor,(v1+v2*-1));
+        
+//         if (average_distance_traveled >= distance_to_travel){
+//             break;
+//         }
+
+//         lcd_print(2,"%f",average_distance_traveled);
+//         lcd_print(3,"%f",distance_to_travel);
+//         delay(50);
+        
+//     }while(1);
+
+//     motorPower(LeftMotor,0);
+//     motorPower(RightMotor,0);
+
+// }
+
 // void rotateAngle(double Kp, double targetAngle) {
 //     int leftencCount, rightencCount;
 //     double left_dis, right_dis;
@@ -279,6 +352,41 @@ void rotateAngle(double Kp, double targetAngle){
 //     motorPower(RightMotor, 0);
 // }
 
+void armangle(double degrees, double Kp, int tolerance)    // possible if to make sure we dont put a value outside of our range (wont exit loop)
+{
+
+
+// Intialising variables
+double currentarmpos;
+double error;
+double voltage;
+double u;
+double x;
+
+// setting arm to highest postion 
+armUp(4000);
+
+// reseting arm encoder counts to 0
+resetEncoder(ArmEncoder);
+
+// using a do-while loop 
+do{
+
+ int armcounts=readSensor(ArmEncoder);
+
+currentarmpos = (360.0/6300.0)*(armcounts) + 41.0;
+error= degrees-currentarmpos;
+u=Kp*error;
+voltage=convertPower(u);
+motorPower(ArmMotor,voltage);
+delay(50);
+}
+while(degrees<(currentarmpos-tolerance));
+
+motorPower(ArmMotor,0);
+
+}
+
 double arm_enc_2_angle(int encoderCounts){
 
     double currentAngle=((encoderCounts*360.0)/(7.0*900.0))+ 41.0;
@@ -288,6 +396,8 @@ double arm_enc_2_angle(int encoderCounts){
 void driveUntilBlack(double precent_power){
     int s1,s2,s3;
     int upper_lim, lower_lim;
+    resetEncoder(RightEncoder);
+    resetEncoder(LeftEncoder);
 
     int Pwr=convertPower(precent_power);
     

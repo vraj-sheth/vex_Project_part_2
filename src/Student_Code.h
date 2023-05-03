@@ -31,6 +31,8 @@ void linefollowing();
 void turnPcont(double targetAngle, double Kp);
 void turnAngle1(float angle, float Kp);
 double arm_enc_2_angle(int encoderCounts);
+void rotateArm(double targetAngle, double Kp);
+void armangle(double degrees, double Kp, int tolerance) ;
 // most of the turn angle functions dont work, the newest one is the turRobot function
 // DO NOT ADD ANY PROTOTYPES AFTER THIS LINE
 #endif  // STUDENT_CODE_H

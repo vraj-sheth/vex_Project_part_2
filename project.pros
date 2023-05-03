@@ -311,7 +311,7 @@
     "upload_options": {
       "icon": "planet",
       "after": "screen",
-      "slot": 4,
+      "slot": 1,
       "description": "My first ME201 program"
     }
   }

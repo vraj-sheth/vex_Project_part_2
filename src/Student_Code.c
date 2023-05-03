@@ -31,38 +31,38 @@ double pivotWheelRatio = 114.0;    // number of encoder ticks per 1 revolution o
 /* Write your code in the function below. You may add helper functions below the studentCode function. */
 void student_Main(){
 {
-// double dis2can = readSensor(SonarSensor);
-// delay(50);
-// drive_to_can(320);
-// moveArmAngle(-13.5.0,2.0);
-// delay(50);
-// drivePcont(20.0,0.8,0.1);
-// delay(50);
-// armUp(4000);
-// double drive_back_dis=dis2can-320-20-673-140;
-// drivePcont(-drive_back_dis,0.8,0.1);
-// delay(50);
-// rotateAngle(7.0,-90.0);
-// delay(50);
-// driveUntilBlack(40.0);
-// delay(50);
-// drivePcont(10.0,0.8,0.1);
-// delay(50);
-// linefollowing();
-// delay(50);
-// drivePcont(254.0,0.8,0.1);
-// delay(50);
-// moveArmAngle(-13.5.0,2);
-// delay(50);
-// drivePcont(-150.0,0.8,0.1);
-// delay(50);
-// rotateAngle(7.0,-90.0);
-// delay(50);
-// drivePcont(1308.0,0.8,0.1);
-// delay(50);
-// rotateAngle(7.0,90.0);
-// delay(50);
-// drivePcont(100.0,0.8,0.1);
+double dis2can = readSensor(SonarSensor);
+delay(50);
+drive_to_can(320);
+moveArmAngle(-13.5,2.0);
+delay(50);
+drivePcont(20.0,0.8,0.1);
+delay(50);
+armUp(4000);
+double drive_back_dis=dis2can-320-20-673-140;
+drivePcont(-drive_back_dis,0.8,0.1);
+delay(50);
+rotateAngle(7.0,-90.0);
+delay(50);
+driveUntilBlack(40.0);
+delay(1000);
+drivePcont(10.0,0.8,0.1);
+delay(50);
+linefollowing();
+delay(50);
+drivePcont(254.0,0.8,0.1);
+delay(50);
+moveArmAngle(-13.5,2);
+delay(50);
+drivePcont(-150.0,0.8,0.1);
+delay(50);
+rotateAngle(7.0,-90.0);
+delay(50);
+drivePcont(1308.0,0.8,0.1);
+delay(50);
+rotateAngle(7.0,90.0);
+delay(50);
+drivePcont(100.0,0.8,0.1);
 
 /////// testing for function in lab:
 

@@ -39,7 +39,7 @@ void student_Main(){
 // drivePcont(20.0,0.8,0.1);
 // delay(50);
 // armUp(4000);
-// double drive_back_dis=dis2can-460-20-673;
+// double drive_back_dis=dis2can-20-673;
 // drivePcont(drive_back_dis,0.8,0.1);
 // delay(50);
 // rotateAngle(7.0,-90.0);

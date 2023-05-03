@@ -276,7 +276,11 @@ void rotateAngle(double Kp, double targetAngle){
 //     motorPower(RightMotor, 0);
 // }
 
+double arm_enc_2_angle(int encoderCounts){
 
+    double currentAngle=((encoderCounts*360.0)/(7.0*900.0))+ 41.0;
+    return currentAngle;
+}
 
 void driveUntilBlack(double precent_power){
     int s1,s2,s3;
@@ -335,7 +339,7 @@ void driveUntilBlack(double precent_power){
         int currnetArmEnc=readSensor(ArmEncoder);
 
         //Why are we using 41??
-        currentAngle=((currnetArmEnc*360.0)/(7.0*900.0))+ 41.0; // 56 is the angle of the arm at top position
+        currentAngle=((currnetArmEnc*360.0)/(7.0*900.0))+ 41.0; 
         error=Angle-currentAngle;
         u=kp*error;
 

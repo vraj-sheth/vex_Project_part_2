@@ -34,13 +34,13 @@ void student_Main(){
     armUp(4000);
 double dis2can = readSensor(SonarSensor);
 delay(50);
-drive_to_can(316);
+drive_to_can(340.0);
 armangle(-15.5,5.0,3.0);
 delay(50);
 drivePcont(60.0,0.8,0.1);
 delay(50);
 armUp(4000);
-double drive_back_dis= (dis2can-(320.0-20.0-673.0-140.0+100.0));
+double drive_back_dis= (dis2can-(1130.5));//320.0-20.0-673.0-140.0+100.0
 drivePcont(-drive_back_dis,0.8,0.1);
 delay(50);
 rotateAngle(7.0,90.0);
@@ -51,7 +51,7 @@ drivePcont(60.0,0.8,0.1);
 delay(50);
 linefollowing();
 delay(50);
-drivePcont(345.0,0.8,0.1);// might need to edit
+drivePcont(338.0,0.8,0.1);// might need to edit
 delay(50);
 armangle(-15.5,5.0,3.0);
 delay(50);
@@ -61,11 +61,11 @@ armUp(4000);
 delay(50);
 rotateAngle(7.0,90.0);
 delay(50);
-drivePcont(1308.0,0.8,0.1);
+drivePcont(1292.0,0.8,0.1);
 delay(50);
 rotateAngle(7.0,-90.0);
 delay(50);
-drivePcont(450.0,0.8,0.1);
+drivePcont(370.0,0.8,0.1);
 
 
 }
@@ -211,11 +211,11 @@ void rotateAngle(double Kp, double targetAngle){
         // finding the mean encoder count
         average_distance_traveled=(fabs(left_dis)+fabs(right_dis))/2.0; 
         // the following if statements make sure that the robot turns both clockwise and counter clockwise, this is done by changing the error which is then later fed into the contorle effort
-        if (targetAngle>0){                                                                                                                                                                           //i changed the  inniquality signs for th if statements
+        if (targetAngle<0){                                                                                                                                                                           //i changed the  inniquality signs for th if statements
             
             error = distance_to_travel + (average_distance_traveled);
         }
-        else if ( targetAngle<0){
+        else if ( targetAngle>0){
 
         error = distance_to_travel - (average_distance_traveled);
         }

@@ -54,7 +54,7 @@ delay(50);
 armUp(4000);
 
 // Calculating the driving back distance
-double drive_back_dis= (dis2can-(1130.5));//320.0-20.0-673.0-140.0+100.0
+double drive_back_dis= (dis2can-(1130.5));
 
 // Drive back the calculated distance between the ultrasonic shield and the centre of the black line
 drivePIcont(-drive_back_dis,0.8,0.1);
@@ -163,7 +163,7 @@ void drivePIcont (double target,double Kp,double Ki){
             i=i+error;
         }
         // defining the control effort using the formula for a PI controlller
-        u=(Kp*error + Ki*i);                                                                                                                            // Divide Kp by 50 when called - allows u to be a percentage equivalent of mv
+        u=(Kp*error + Ki*i);                                                                                                                            
 
         // creating a variable called differnece that records the differnece in thee wheels encoder counts as to send more or less power to the wheel later
         double differance=(L_encoder-R_encoder)*10; // the "10" is a second Kp 
@@ -244,7 +244,7 @@ void rotateAngle(double Kp, double targetAngle){
         // finding the mean encoder count
         average_distance_traveled=(fabs(left_dis)+fabs(right_dis))/2.0; 
         // the following if statements make sure that the robot turns both clockwise and counter clockwise, this is done by changing the error which is then later fed into the contorle effort
-        if (targetAngle<0){                                                                                                                                                                           //i changed the  inniquality signs for th if statements
+        if (targetAngle<0){                                                                                                                                                                          
             
             error = distance_to_travel + (average_distance_traveled);
         }
@@ -281,7 +281,7 @@ void rotateAngle(double Kp, double targetAngle){
 
 }
 
-void armangle(double targetAngle, double Kp, int tolerance)    // possible if to make sure we dont put a value outside of our range (wont exit loop)
+void armangle(double targetAngle, double Kp, int tolerance)   
 {
     // this function takes three inputs and uses them to rotate the arm to a given angle
     // inputs:

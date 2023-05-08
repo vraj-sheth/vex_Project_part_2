@@ -31,47 +31,76 @@ double pivotWheelRatio = 114.0;    // number of encoder ticks per 1 revolution o
 /* Write your code in the function below. You may add helper functions below the studentCode function. */
 void student_Main(){
 {
-    armUp(4000);
+
+// Lifts the arm up and prevent it from interfering with the sonar
+armUp(4000);
+
+// Read the distance between the robot at the starting position and the can
 double dis2can = readSensor(SonarSensor);
 delay(50);
-drive_to_can(340.0);
+
+// Driving to the can 
+drive_to_can(400.0);
+
+// Lowering arm for picking up the payload
 armangle(-15.5,5.0,3.0);
 delay(50);
-drivePcont(60.0,0.8,0.1);
+
+// Going forward after the arm has been lowered 
+drivePIcont(60.0,0.8,0.1);
 delay(50);
+
+// Picks up the payload
 armUp(4000);
+
+// Calculating the driving back distance
 double drive_back_dis= (dis2can-(1130.5));//320.0-20.0-673.0-140.0+100.0
-drivePcont(-drive_back_dis,0.8,0.1);
+
+// Drive back the calculated distance between the ultrasonic shield and the centre of the black line
+drivePIcont(-drive_back_dis,0.8,0.1);
 delay(50);
-rotateAngle(7.0,90.0);
+
+// Rotate so that the robot is aligned with the centre of the black line
+rotateAngle(7.0,-90.0);
 delay(50);
+
+// Robot will drive until the black line, move forward a bit to prevent early termination of line following and line following will engage
 driveUntilBlack(40.0);
 delay(1000);
-drivePcont(60.0,0.8,0.1);
+drivePIcont(60.0,0.8,0.1);
 delay(50);
 linefollowing();
 delay(50);
-drivePcont(338.0,0.8,0.1);// might need to edit
+
+// Drives the forward to the drop off point
+drivePIcont(342.0,0.8,0.1);// might need to edit
 delay(50);
+
+// Drops off the payload and drives backwards and lifts the arm up again
 armangle(-15.5,5.0,3.0);
 delay(50);
-drivePcont(-150.0,0.8,0.1);
+drivePIcont(-150.0,0.8,0.1);
 delay(50);
 armUp(4000);
 delay(50);
-rotateAngle(7.0,90.0);
-delay(50);
-drivePcont(1292.0,0.8,0.1);
-delay(50);
+
+
+// Rotates the robot 90 degrees, drives the specified distance to the finish zone 
 rotateAngle(7.0,-90.0);
 delay(50);
-drivePcont(370.0,0.8,0.1);
+drivePIcont(1292.0,0.8,0.1);
+delay(50);
+
+// Robot rotates so that the front is facing the finish zone and drives the distance so its inside the finish zone
+rotateAngle(7.0,110.0);
+delay(50);
+drivePIcont(400.0,0.8,0.1);
 
 
 }
 
 }
-// Task 1 //
+// Convert power function //
 int convertPower(double power_input){
   int voltage, saturated_power;
 // Limit power percentage to be between -100% and 100%
@@ -99,7 +128,7 @@ double encTodistance (int enc_count){
 }
 
 
-void drivePcont (double target,double Kp,double Ki){
+void drivePIcont (double target,double Kp,double Ki){
     // this function takes three inputs, the target distance, the KP, and the Ki to drive the robot a given distance.
 
     // inputs:
@@ -172,7 +201,7 @@ void drive_to_can(int stopping_distance){
     // defining the stopping distance as being the distance to the can minus the given stoppping distance
     double end_distance = (d2can)-stopping_distance;
     // calling the drive forwards function to drive the wanted distance
-    drivePcont(end_distance,0.35,0.1);
+    drivePIcont(end_distance,0.35,0.1);
     
 }    
 
@@ -197,6 +226,10 @@ void rotateAngle(double Kp, double targetAngle){
     double distance_to_travel= (targetAngle)/360.0*pivotCircle;
     double v1,v2;
     double diff;
+
+        // setting target angle to be negative as our code uses clockwiew turns as being positive. this makes it that the target angle is now respective of anticlockwise being positive
+        targetAngle=targetAngle*-1.0;
+    
     // reseting the wheels encoders so previous reading don't interfere with the current code
     resetEncoder(LeftEncoder);
     resetEncoder(RightEncoder);
